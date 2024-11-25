@@ -36,7 +36,10 @@ app.get("/scrape", async (req, res) => {
     const page = await browser.newPage();
 
     // Configurar agente de usuario para evitar bloqueos
-    await page.setUserAgent("Mozilla/5.0 ... Chrome/91.0 Safari/537.36");
+    await page.setExtraHTTPHeaders({
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124 Safari/537.36",
+    });
 
     // Ir a la página
     await page.goto(url, { waitUntil: "domcontentloaded" });
