@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "install-browsers": "playwright install chromium",
-    "build": "npm run install-browsers"
+    "postinstall": "playwright install-deps && playwright install chromium",
+    "build": "npm run postinstall"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +16,8 @@
     "express": "^4.21.1",
     "express-rate-limit": "^7.4.1",
     "playwright": "^1.49.0"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }

@@ -30,37 +30,24 @@ app.get("/scrape", async (req, res) => {
       .json({ error: "Please provide a URL as a query parameter." });
   }
 
+  let browser;
   try {
-    // Lanzar navegador
-    const browser = await chromium.launch({
+    browser = await chromium.launch({
       headless: true,
-      chromiumSandbox: false, // Necesario para entornos como Render
-      args: ["--no-sandbox", "--disable-setuid-sandbox"], // Argumentos adicionales para entornos cloud
-    });
-    const page = await browser.newPage();
-
-    // Configurar agente de usuario para evitar bloqueos
-    await page.setExtraHTTPHeaders({
-      "User-Agent":
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124 Safari/537.36",
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+      ],
     });
 
-    // Ir a la página
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
     await page.goto(url, { waitUntil: "domcontentloaded" });
-
-    // Manejar cookies (si aplica)
-    const cookieButton = await page.$('button:has-text("Accept")');
-    if (cookieButton) {
-      await cookieButton.click();
-    }
-
-    // Extraer contenido
     const content = await page.content();
 
-    // Cerrar navegador
     await browser.close();
-
-    // Enviar respuesta
     res.json({ content });
   } catch (error) {
     console.error("Error detallado:", error);
@@ -68,6 +55,10 @@ app.get("/scrape", async (req, res) => {
       error: "Failed to scrape the page.",
       details: error.message,
     });
+  } finally {
+    if (browser) {
+      await browser.close().catch(console.error);
+    }
   }
 });
 
