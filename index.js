@@ -32,7 +32,11 @@ app.get("/scrape", async (req, res) => {
 
   try {
     // Lanzar navegador
-    const browser = await chromium.launch();
+    const browser = await chromium.launch({
+      headless: true,
+      chromiumSandbox: false, // Necesario para entornos como Render
+      args: ["--no-sandbox", "--disable-setuid-sandbox"], // Argumentos adicionales para entornos cloud
+    });
     const page = await browser.newPage();
 
     // Configurar agente de usuario para evitar bloqueos
@@ -59,8 +63,11 @@ app.get("/scrape", async (req, res) => {
     // Enviar respuesta
     res.json({ content });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to scrape the page." });
+    console.error("Error detallado:", error);
+    res.status(500).json({
+      error: "Failed to scrape the page.",
+      details: error.message,
+    });
   }
 });
 
