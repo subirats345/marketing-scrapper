@@ -34,20 +34,29 @@ app.get("/scrape", async (req, res) => {
   try {
     browser = await chromium.launch({
       headless: true,
+      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
       args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
+        "--disable-gpu",
         "--disable-dev-shm-usage",
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
       ],
     });
 
-    const context = await browser.newContext();
+    const context = await browser.newContext({
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124 Safari/537.36",
+    });
+
     const page = await context.newPage();
 
-    await page.goto(url, { waitUntil: "domcontentloaded" });
+    await page.goto(url, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000, // 30 segundos de timeout
+    });
+
     const content = await page.content();
 
-    await browser.close();
     res.json({ content });
   } catch (error) {
     console.error("Error detallado:", error);

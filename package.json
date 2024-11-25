@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "postinstall": "playwright install-deps && playwright install chromium",
-    "build": "npm run postinstall"
+    "postinstall": "npx playwright install-deps && npx playwright install chromium"
   },
   "keywords": [],
   "author": "",
